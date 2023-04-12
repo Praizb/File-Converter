@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Converter</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+      integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+      crossorigin="anonymous"
+    />
+    <style>
+      .custom-file-upload {
+        display: inline-block;
+        cursor: pointer;
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: #fff;
+        border-radius: 5px;
+      }
+
+      .custom-file-upload i {
+        margin-right: 5px;
+      }
+
+      input[type="file"] {
+        display: none;
+      }
+      body {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        background: #4caf50;
+        color: white;
+      }
+      .form-outline {
+        text-align: center;
+        margin-top: 300px;
+      }
+      button {
+        box-shadow: 2px 2px 2px 1px rgb(131, 131, 219);
+        border: 1px solid gray;
+        padding: 12px 40px;
+        border-radius: 8px;
+        font-size: 20px;
+        cursor: pointer;
+      }
+      label {
+        display: block;
+        font-size: 1rem;
+        font-family: sans-serif;
+      }
+      input[type="url"] {
+        border: 2px solid #ccc;
+        width: auto;
+        padding: 12px 20px;
+        box-sizing: border-box;
+        margin: 8px 0;
+        font-size: 16px;
+      }
+
+      input[type="file"] {
+        background: none;
+        cursor: pointer;
+      }
+      .btn {
+        margin: 10px;
+      }
+      p {
+        font-size: large;
+      }
+      header {
+        font-size: 20px;
+      }
+      input::placeholder {
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <section>
+      <div class="form-outline">
+        <header>CONVERT YOUR FILES HERE</header>
+        <% if (locals.msg) { %>
+        <div><%= msg %></div>
+        <% } %>
+        <button class="btn" type="button" id="url_button">URL TO PDF</button>
+        <button class="btn" type="button" id="html_button">HTML TO PDF</button>
+        <button class="btn" type="button" id="pdf_button">PDF TO DOC</button>
+        <button class="btn" type="button" id="doc_button">DOC TO PDF</button>
+        <% if (locals.link) { %>
+        <button
+          type="button"
+          id="button"
+          class="btn rounded btn-secondary btn-lg w-50 text-light shadow border-0"
+        >
+          <a href="<%= link %>">Download File</a>
+        </button>
+        <% } %>
+
+        <div id="url" style="display: block">
+          <p>URL TO HTML</p>
+          <form action="/" method="post">
+            <input
+              type="url"
+              placeholder="input your url"
+              id="url"
+              name="url"
+              required
+            />
+            <button class="btn_submit" type="submit">Convert</button>
+          </form>
+        </div>
+        <div id="html" style="display: none">
+          <p>HTML TO PDF</p>
+          <form action="/" method="post">
+            <button
+              type="button"
+              id="button"
+              class="btn rounded btn-secondary btn-lg w-50 text-light shadow border-0"
+              onclick="document.getElementById('file2').click()"
+            >
+              <i class="fas fa-cloud-upload-alt"></i> HTML file
+            </button>
+            <input type="file" id="file2" name="html" required />
+            <button type="submit">Convert</button>
+          </form>
+        </div>
+
+        <div id="pdf" style="display: none">
+          <p>PDF TO DOC</p>
+          <form action="/" method="post">
+            <button
+              type="button"
+              id="button"
+              class="btn rounded btn-secondary btn-lg w-50 text-light shadow border-0"
+              onclick="document.getElementById('file3').click()"
+            >
+              <i class="fas fa-cloud-upload-alt"></i> PDF file
+            </button>
+            <input
+              type="file"
+              id="file3"
+              name="pdf"
+              onchange="upload_file3()"
+            />
+            <input type="hidden" id="path_pdf" name="path" required />
+            <button type="submit">Convert</button>
+          </form>
+        </div>
+
+        <div id="doc" style="display: none">
+          <p>DOC TO PDF</p>
+          <form action="/" method="post">
+            <button
+              type="button"
+              id="button"
+              class="btn rounded btn-secondary btn-lg w-50 text-light shadow border-0"
+              onclick="document.getElementById('file4').click()"
+            >
+              <i class="fas fa-cloud-upload-alt"></i> Doc File
+            </button>
+            <input
+              type="file"
+              id="file4"
+              name="doc"
+              onchange="upload_file4()"
+            />
+            <input type="hidden" id="path_doc" name="path" required />
+            <button type="submit">Convert</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      const url_button = document.getElementById("url_button");
+      const html_button = document.getElementById("html_button");
+      const pdf_button = document.getElementById("pdf_button");
+      const doc_button = document.getElementById("doc_button");
+      const pdf_url = document.getElementById("path");
+
+      function upload_file3() {
+        const files = document.getElementById("file3").files;
+        const formData = new FormData();
+
+        for (let i = 0; i < files.length; i++) {
+          formData.append("file", files[i]);
+        }
+
+        fetch("/upload", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("path_pdf").value = data.path;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+
+      function upload_file4() {
+        const files = document.getElementById("file4").files;
+        const formData = new FormData();
+
+        for (let i = 0; i < files.length; i++) {
+          formData.append("file", files[i]);
+        }
+
+        fetch("/upload", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("path_doc").value = data.path;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+
+      url_button.onclick = () => {
+        document.getElementById("url").style = "display:block";
+        document.getElementById("html").style = "display:none";
+        document.getElementById("pdf").style = "display:none";
+        document.getElementById("doc").style = "display:none";
+      };
+      pdf_button.onclick = () => {
+        document.getElementById("pdf").style = "display:block";
+        document.getElementById("html").style = "display:none";
+        document.getElementById("url").style = "display:none";
+        document.getElementById("doc").style = "display:none";
+      };
+      html_button.onclick = () => {
+        document.getElementById("html").style = "display:block";
+        document.getElementById("url").style = "display:none";
+        document.getElementById("pdf").style = "display:none";
+        document.getElementById("doc").style = "display:none";
+      };
+      doc_button.onclick = () => {
+        document.getElementById("doc").style = "display:block";
+        document.getElementById("url").style = "display:none";
+        document.getElementById("pdf").style = "display:none";
+        document.getElementById("html").style = "display:none";
+      };
+    </script>
+  </body>
+</html>
